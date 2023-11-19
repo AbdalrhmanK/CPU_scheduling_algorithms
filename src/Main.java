@@ -34,6 +34,7 @@ public class Main {
 			break;
 		case 2:
 			System.out.println("Your choice : Shortest-Job-First (SJF)");
+			Scheduler.SJF(readyQueue);
 			break;
 		case 3:
 			System.out.println("Your choice :  Round-Robin (RR-3)");

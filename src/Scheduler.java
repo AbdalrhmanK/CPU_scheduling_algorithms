@@ -35,6 +35,48 @@ public class Scheduler {
 
 	}
 
+	public static void SJF(Queue<PCB> readyQueue) {
+
+		int currentTime = 0;
+		int waitingTime = 0;
+		Queue<PCB> copyQueue = new LinkedList<>(readyQueue);
+
+		while (!readyQueue.isEmpty()) {
+			PCB pcb = getShortestJob(readyQueue);
+
+			int startBT = currentTime;
+			int stopBT = pcb.BurstTime;
+
+			GanttChart(startBT, startBT + stopBT, pcb);
+
+			currentTime += stopBT;
+			pcb.CompletionTime = currentTime;
+			pcb.WaitingTime = waitingTime;
+
+			waitingTime += stopBT;
+			pcb.Remaing_BurstTime = 0;
+			pcb.state = ProcessState.Terminated;
+
+			readyQueue.remove(pcb);
+		}
+
+		Result(copyQueue);
+	}
+
+	private static PCB getShortestJob(Queue<PCB> readyQueue) {
+		int minBurstTime = Integer.MAX_VALUE;
+		PCB minPCB = null;
+
+		for (PCB p : readyQueue) {
+			if (p.BurstTime < minBurstTime) {
+				minBurstTime = p.BurstTime;
+				minPCB = p;
+			}
+		}
+
+		return minPCB;
+	}
+
 	public static void Result(Queue<PCB> readyQueue) {
 
 		int totalWaitingTime = 0;
@@ -61,7 +103,7 @@ public class Scheduler {
 		}
 
 		System.out.println("___________________________________________________________________________");
-		System.out.println( (int)Counter + " Processes Completed");
+		System.out.println((int) Counter + " Processes Completed");
 
 		if (Counter <= 0) {
 			System.out.println("The program stopped because there wasn't enough space in the memory.");
