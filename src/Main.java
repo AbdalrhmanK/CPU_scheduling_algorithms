@@ -38,9 +38,13 @@ public class Main {
 			break;
 		case 3:
 			System.out.println("Your choice :  Round-Robin (RR-3)");
+			Scheduler.RR(readyQueue, 3);
+
 			break;
 		case 4:
 			System.out.println("Your choice :  Round-Robin (RR-5)");
+			Scheduler.RR(readyQueue, 5);
+
 			break;
 		default:
 			System.out.println("Invalid selection.");

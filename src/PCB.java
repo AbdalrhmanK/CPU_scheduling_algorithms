@@ -12,16 +12,14 @@ public class PCB  {
         public int WaitingTime;
         public int arrivalTime = 0 ;
         public int CompletionTime;
-        public int Remaing_BurstTime;
-        
+        public int TotalBurstTime;
         
         public PCB(int Pid , int BurstTime, int Memory) {
         	
         	ProcessID = Pid ;
         	this.BurstTime = BurstTime;
         	this.Memory_Required = Memory;
-        	this.Remaing_BurstTime = BurstTime;
-        	
+        	this.TotalBurstTime = BurstTime;
         	
         }
 	

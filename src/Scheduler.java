@@ -15,7 +15,7 @@ public class Scheduler {
 
 			pcb.state = ProcessState.Ready;
 
-			stopBT = pcb.Remaing_BurstTime;
+			stopBT = pcb.BurstTime;
 
 			GanttChart(startBT, startBT + stopBT, pcb);
 
@@ -25,7 +25,7 @@ public class Scheduler {
 			pcb.WaitingTime = waitingTime - pcb.arrivalTime;
 
 			waitingTime = startBT + stopBT;
-			pcb.Remaing_BurstTime = 0;
+			pcb.BurstTime = 0;
 			pcb.state = ProcessState.Terminated;
 
 			startBT += stopBT;
@@ -54,7 +54,7 @@ public class Scheduler {
 			pcb.WaitingTime = waitingTime;
 
 			waitingTime += stopBT;
-			pcb.Remaing_BurstTime = 0;
+			pcb.BurstTime = 0;
 			pcb.state = ProcessState.Terminated;
 
 			readyQueue.remove(pcb);
@@ -63,7 +63,7 @@ public class Scheduler {
 		Result(copyQueue);
 	}
 
-	private static PCB getShortestJob(Queue<PCB> readyQueue) {
+	public static PCB getShortestJob(Queue<PCB> readyQueue) {
 		int minBurstTime = Integer.MAX_VALUE;
 		PCB minPCB = null;
 
@@ -75,6 +75,45 @@ public class Scheduler {
 		}
 
 		return minPCB;
+	}
+
+	public static void RR(Queue<PCB> readyQueue, int quantum) {
+	    int currentTime = 0;
+	    int startBT = 0;
+	    int stopBT = 0;
+	    Queue<PCB> copyQueue = new LinkedList<>(readyQueue);
+
+	    while (!readyQueue.isEmpty()) {
+	        PCB pcb = readyQueue.poll();
+	        int burstTime = pcb.BurstTime;
+
+	        if (burstTime > quantum) {
+	            burstTime = quantum;
+	            pcb.BurstTime -= quantum;
+	            readyQueue.add(pcb);
+	        } else {
+	            pcb.state = ProcessState.Terminated;
+	        }
+
+	        stopBT = startBT + burstTime; // Calculate stopBT
+
+	        GanttChart(startBT, stopBT, pcb); // Pass startBT and stopBT parameters
+
+	        currentTime += burstTime;
+	        startBT += burstTime;
+
+	        if (pcb.state == ProcessState.Terminated) {
+	            updateCompletionAndWaitingTime(pcb, currentTime);
+	        }
+	    }
+
+	    Result(copyQueue);
+	}
+	public static void updateCompletionAndWaitingTime(PCB pcb, int currentTime) {
+	    int completionTime = currentTime ;
+	    int waitingTime = completionTime - pcb.TotalBurstTime;
+	    pcb.CompletionTime = completionTime;
+	    pcb.WaitingTime = waitingTime;
 	}
 
 	public static void Result(Queue<PCB> readyQueue) {
