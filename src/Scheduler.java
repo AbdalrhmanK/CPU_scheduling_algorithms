@@ -145,7 +145,7 @@ public class Scheduler {
 		System.out.println((int) Counter + " Processes Completed");
 
 		if (Counter <= 0) {
-			System.out.println("The program stopped because there wasn't enough space in the memory.");
+			System.out.println("The program stopped because there wasn't processes in the memory.");
 			return;
 		}
 

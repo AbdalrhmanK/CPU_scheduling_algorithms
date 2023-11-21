@@ -18,48 +18,41 @@ public class Main {
 		read.start();
 		read.join();
 		load.start();
+		try {
+			Scanner input = new Scanner(System.in);
+			System.out.println("Select a scheduling algorithm: ");
+			System.out.println("1. First-Come-First-Serve (FCFS)");
+			System.out.println("2. Shortest-Job-First (SJF)");
+			System.out.println("3. Round-Robin (RR-3)");
+			System.out.println("4. Round-Robin (RR-5)");
+			int algorithm = input.nextInt();
 
-		Scanner input = new Scanner(System.in);
-		System.out.println("Select a scheduling algorithm: ");
-		System.out.println("1. First-Come-First-Serve (FCFS)");
-		System.out.println("2. Shortest-Job-First (SJF)");
-		System.out.println("3. Round-Robin (RR-3)");
-		System.out.println("4. Round-Robin (RR-5)");
-		int algorithm = input.nextInt();
+			switch (algorithm) {
+			case 1:
+				System.out.println("Your choice : First-Come-First-Serve (FCFS) ");
+				Scheduler.FCFS(readyQueue);
+				break;
+			case 2:
+				System.out.println("Your choice : Shortest-Job-First (SJF)");
+				Scheduler.SJF(readyQueue);
+				break;
+			case 3:
+				System.out.println("Your choice :  Round-Robin (RR-3)");
+				Scheduler.RR(readyQueue, 3);
 
-		switch (algorithm) {
-		case 1:
-			System.out.println("Your choice : First-Come-First-Serve (FCFS) ");
-			Scheduler.FCFS(readyQueue);
-			break;
-		case 2:
-			System.out.println("Your choice : Shortest-Job-First (SJF)");
-			Scheduler.SJF(readyQueue);
-			break;
-		case 3:
-			System.out.println("Your choice :  Round-Robin (RR-3)");
-			Scheduler.RR(readyQueue, 3);
+				break;
+			case 4:
+				System.out.println("Your choice :  Round-Robin (RR-5)");
+				Scheduler.RR(readyQueue, 5);
 
-			break;
-		case 4:
-			System.out.println("Your choice :  Round-Robin (RR-5)");
-			Scheduler.RR(readyQueue, 5);
-
-			break;
-		default:
-			System.out.println("Invalid selection.");
-			break;
+				break;
+			default:
+				System.out.println("Invalid selection.");
+				break;
+			}
+		} catch (Exception e) {
+			System.out.println("Please add a number between 1-4 please ! ");
 		}
-
-//		PCB pcb = jobQueue.poll();
-//		System.out.print(pcb.ProcessID);
-//		System.out.print(pcb.BurstTime);
-//		System.out.print(pcb.Memory_Required);
-//		System.out.print(pcb.PS);
-//		
-//		lt.start();
-
-//		System.out.print(10);
 	}
 
 }
@@ -97,7 +90,7 @@ class ReadJob extends Thread {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.out.print("Please add a file path for (job.txt) ! ");
+			System.out.println("Please add a file path for (job.txt) ! ");
 		}
 
 	}
