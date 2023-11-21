@@ -77,23 +77,52 @@ class ReadJob extends Thread {
 			while (R.hasNextLine()) {
 				String jobName = R.nextLine();
 				String data = R.nextLine();
+				if (data.isEmpty()) {
+					break;
+				}
 				String[] m1 = data.split(",");
 
+				if (m1.length != 3) {
+					System.out.println(
+							"all jobs should be given as follows (Process ID, burst time in ms, memory required in MB) ");
+					jobQueue.clear();
+					return;
+
+				}
+
 				if (m1.length == 3) {
-					int pid = Integer.parseInt(m1[0].trim());
-					int BrustTime = Integer.parseInt(m1[1].trim());
-					int Memory = Integer.parseInt(m1[2].trim());
-					PCB p = new PCB(pid, BrustTime, Memory);
-					System.out.println("Jop" + p.ProcessID);
-					System.out.println(p.ProcessID + "-" + p.BurstTime + "-" + p.Memory_Required);
-					jobQueue.add(p);
+					try {
+						int pid = Integer.parseInt(m1[0].trim());
+						int BrustTime = Integer.parseInt(m1[1].trim());
+						int Memory = Integer.parseInt(m1[2].trim());
+						if (pid < 0 || BrustTime < 0 || Memory < 0) {
+							System.out.println("Error in job.txt file , all jobs should be only positive integers ");
+							jobQueue.clear();
+							return;
+
+						}
+						PCB p = new PCB(pid, BrustTime, Memory);
+						System.out.println("Jop" + p.ProcessID);
+						System.out.println(p.ProcessID + "-" + p.BurstTime + "-" + p.Memory_Required);
+						jobQueue.add(p);
+					} catch (Exception e) {
+						System.out.println("Error in job.txt file , all jobs should be only positive integers ");
+						jobQueue.clear();
+						return;
+					}
+
 				}
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Please add a file path for (job.txt) ! ");
-		}
+//		} catch (Exception e) {
+//			System.out.println("Please make sure the structer of job.txt is ( job then data) ! ");
+//			jobQueue.clear();
+//
+//		}
 
 	}
+		}
 
 }
 
@@ -117,6 +146,8 @@ class LoadJob extends Thread {
 				if (memorySize >= memory_process) {
 					readyQueue.add(jobQueue.poll());
 					memorySize = memorySize - memory_process;
+				} else {
+					jobQueue.poll();
 				}
 
 			}
