@@ -59,6 +59,7 @@ public class Main {
 
 class ReadJob extends Thread {
 	private Queue<PCB> jobQueue;
+	int arrivalTime = 0;
 
 	public ReadJob(Queue<PCB> jobQueue) {
 		this.jobQueue = jobQueue;
@@ -76,10 +77,13 @@ class ReadJob extends Thread {
 			R = new Scanner(F);
 			while (R.hasNextLine()) {
 				String jobName = R.nextLine();
+		        if (!jobName.contains("Job")) {
+					System.out.println("Please make sure the structer of job.txt is ( job then data) ! ");
+					jobQueue.clear();
+		        	return ;
+		        }
 				String data = R.nextLine();
-				if (data.isEmpty()) {
-					break;
-				}
+
 				String[] m1 = data.split(",");
 
 				if (m1.length != 3) {
@@ -89,22 +93,25 @@ class ReadJob extends Thread {
 					return;
 
 				}
+//				/Users/AK/Desktop/job.txt
 
 				if (m1.length == 3) {
 					try {
 						int pid = Integer.parseInt(m1[0].trim());
 						int BrustTime = Integer.parseInt(m1[1].trim());
 						int Memory = Integer.parseInt(m1[2].trim());
-						if (pid < 0 || BrustTime < 0 || Memory < 0) {
+						if (pid < 0 || BrustTime <= 0 || Memory < 0) {
 							System.out.println("Error in job.txt file , all jobs should be only positive integers ");
 							jobQueue.clear();
 							return;
 
 						}
 						PCB p = new PCB(pid, BrustTime, Memory);
-						System.out.println("Jop" + p.ProcessID);
-						System.out.println(p.ProcessID + "-" + p.BurstTime + "-" + p.Memory_Required);
+						p.arrivalTime = arrivalTime;
+//						System.out.println("Jop" + p.ProcessID);
+//						System.out.println(p.ProcessID + "-" + p.BurstTime + "-" + p.Memory_Required+'-'+p.arrivalTime);
 						jobQueue.add(p);
+						arrivalTime++;
 					} catch (Exception e) {
 						System.out.println("Error in job.txt file , all jobs should be only positive integers ");
 						jobQueue.clear();
@@ -115,16 +122,12 @@ class ReadJob extends Thread {
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("Please add a file path for (job.txt) ! ");
-//		} catch (Exception e) {
-//			System.out.println("Please make sure the structer of job.txt is ( job then data) ! ");
-//			jobQueue.clear();
-//
-//		}
-
-	}
 		}
 
-}
+		}
+	}
+
+
 
 class LoadJob extends Thread {
 
@@ -144,7 +147,9 @@ class LoadJob extends Thread {
 			if (!jobQueue.isEmpty()) {
 				int memory_process = jobQueue.peek().Memory_Required;
 				if (memorySize >= memory_process) {
-					readyQueue.add(jobQueue.poll());
+					PCB pcb = jobQueue.poll();
+					pcb.state = ProcessState.Ready;
+					readyQueue.add(pcb);
 					memorySize = memorySize - memory_process;
 				} else {
 					jobQueue.poll();
