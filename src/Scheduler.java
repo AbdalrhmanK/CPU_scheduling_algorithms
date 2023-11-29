@@ -2,12 +2,12 @@ import java.util.*;
 
 public class Scheduler {
 
-	public static void FCFS(Queue<PCB> readyQueue) {
+	public static void FCFS(Queue<PCB> readyQueue, usedMemory memory) {
 
 		int startBT = 0;
 		int stopBT = 0;
 		int waitingTime = 0;
-		Queue<PCB> copyQueue = new LinkedList<>(readyQueue);
+		Queue<PCB> copyQueue = new LinkedList<>();
 
 		while (!readyQueue.isEmpty()) {
 
@@ -25,19 +25,26 @@ public class Scheduler {
 			waitingTime = startBT + stopBT;
 			pcb.BurstTime = 0;
 			pcb.state = ProcessState.Terminated;
-
 			startBT += stopBT;
+			copyQueue.add(pcb);
+			memory.setPositiveMemory(pcb.Memory_Required);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 		Result(copyQueue);
 
 	}
 
-	public static void SJF(Queue<PCB> readyQueue) {
+	public static void SJF(Queue<PCB> readyQueue, usedMemory memory) {
 
 		int currentTime = 0;
 		int waitingTime = 0;
-		Queue<PCB> copyQueue = new LinkedList<>(readyQueue);
+		Queue<PCB> copyQueue = new LinkedList<>();
 
 		while (!readyQueue.isEmpty()) {
 			PCB pcb = getShortestJob(readyQueue);
@@ -56,7 +63,15 @@ public class Scheduler {
 			pcb.BurstTime = 0;
 			pcb.state = ProcessState.Terminated;
 
+			copyQueue.add(pcb);
 			readyQueue.remove(pcb);
+			memory.setPositiveMemory(pcb.Memory_Required);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		Result(copyQueue);
@@ -76,12 +91,12 @@ public class Scheduler {
 		return minPCB;
 	}
 
-	public static void RR(Queue<PCB> readyQueue, int quantum) {
+	public static void RR(Queue<PCB> readyQueue, int quantum, usedMemory memory) {
 		int currentTime = 0;
 		int startBT = 0;
 		int stopBT = 0;
 
-		Queue<PCB> copyQueue = new LinkedList<>(readyQueue);
+		Queue<PCB> copyQueue = new LinkedList<>();
 
 		while (!readyQueue.isEmpty()) {
 			PCB pcb = readyQueue.poll();
@@ -93,7 +108,7 @@ public class Scheduler {
 
 				burstTime = quantum;
 				pcb.BurstTime -= quantum;
-	            readyQueue.add(pcb);
+				readyQueue.add(pcb);
 			} else {
 				pcb.state = ProcessState.Terminated;
 			}
@@ -104,42 +119,26 @@ public class Scheduler {
 
 			currentTime += burstTime;
 			startBT += burstTime;
-             System.out.print(burstTime);
 			if (pcb.state == ProcessState.Terminated) {
 				updateCompletionAndWaitingTime(pcb, currentTime);
+				copyQueue.add(pcb);
+				memory.setPositiveMemory(pcb.Memory_Required);
+				try {
+					Thread.sleep(1500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else {
-				addProcessToQueueBasedOnArrivalTime(readyQueue, pcb, stopBT);
 			}
 		}
 
 		Result(copyQueue);
 	}
 
-	public static void addProcessToQueueBasedOnArrivalTime(Queue<PCB> readyQueue , PCB pcb , int burstTime ) {
-		
-	    Queue<PCB> copyQueue = new LinkedList<>();
-	    Queue<PCB> copyQueue1 = new LinkedList<>();
-
-    	while (!readyQueue.isEmpty()) {
-	        PCB pcb1 = readyQueue.poll();
-            
-	        if (pcb1.arrivalTime<= burstTime) {
-	        	copyQueue.add(pcb1);
-	        }else {
-	        	copyQueue1.add(pcb1);
-	        }
-    		
-    		
-    	}
-    	readyQueue.clear();
-    	copyQueue.addAll(copyQueue1);
-    	readyQueue.addAll(copyQueue);
-    	
-    }
-
 	public static void updateCompletionAndWaitingTime(PCB pcb, int currentTime) {
 		int completionTime = currentTime;
-		int waitingTime = (completionTime - pcb.TotalBurstTime) - pcb.arrivalTime;
+		int waitingTime = (completionTime - pcb.TotalBurstTime);
 		pcb.CompletionTime = completionTime;
 		pcb.WaitingTime = waitingTime;
 
@@ -157,7 +156,6 @@ public class Scheduler {
 
 		while (!readyQueue.isEmpty()) {
 			PCB pcb = readyQueue.poll();
-
 			if (pcb.state == ProcessState.Terminated) {
 				Counter += 1;
 				totalWaitingTime += pcb.WaitingTime;
@@ -187,7 +185,7 @@ public class Scheduler {
 
 	public static void GanttChart(int StartBT, int StopBT, PCB P) {
 		System.out.println(" _____");
-		System.out.println("| P" + P.ProcessID + " |");
+		System.out.println("|" + P.jobName + "|");
 		System.out.println(StartBT + "----" + StopBT);
 	}
 
